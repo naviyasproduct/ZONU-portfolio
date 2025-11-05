@@ -9,6 +9,7 @@ export default function ThoughtsClient() {
   const [loading, setLoading] = useState(true);
   const [expandedDates, setExpandedDates] = useState(new Set());
   const [groupedPosts, setGroupedPosts] = useState({});
+  const [thoughtStats, setThoughtStats] = useState({}); // Store like/comment counts
 
   useEffect(() => {
     let mounted = true;
@@ -44,6 +45,9 @@ export default function ThoughtsClient() {
         if (grouped[today]) {
           setExpandedDates(new Set([today]));
         }
+
+        // Fetch comment counts for all thoughts
+        await fetchCommentCounts(postsData);
         
       } catch (err) {
         console.error('[ThoughtsClient] Error loading posts:', err);
@@ -56,6 +60,31 @@ export default function ThoughtsClient() {
         }
       }
     }
+
+    async function fetchCommentCounts(thoughts) {
+      try {
+        const stats = {};
+        
+        // For each thought, get its comment count from subcollection
+        for (const thought of thoughts) {
+          const commentsSnap = await getDocs(
+            collection(db, 'thoughts', thought.id, 'comments')
+          );
+          
+          stats[thought.id] = {
+            likes: thought.likeCount || 0, // likeCount is stored on the thought document itself
+            comments: commentsSnap.size,
+          };
+        }
+
+        if (mounted) {
+          setThoughtStats(stats);
+        }
+      } catch (error) {
+        console.error('Error fetching comment counts:', error);
+      }
+    }
+
     load();
     return () => { mounted = false };
   }, []);
@@ -324,10 +353,41 @@ export default function ThoughtsClient() {
                         lineHeight: '1.4',
                         textAlign: 'center',
                         opacity: 0.9,
+                        marginBottom: '0.75rem',
                       }}>
                         {post.title}
                       </h3>
                     )}
+
+                    {/* Like and Comment Count */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '1.5rem',
+                      marginTop: '0.75rem',
+                      paddingTop: '0.75rem',
+                      borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                      fontSize: '0.9rem',
+                      opacity: 0.7,
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                      }}>
+                        <span style={{ fontSize: '1.1rem' }}>❤️</span>
+                        <span>{thoughtStats[post.id]?.likes || 0}</span>
+                      </div>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                      }}>
+                        <span style={{ fontSize: '1.1rem' }}>💬</span>
+                        <span>{thoughtStats[post.id]?.comments || 0}</span>
+                      </div>
+                    </div>
                     
                   </a>
                 ))}
