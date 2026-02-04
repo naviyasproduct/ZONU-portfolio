@@ -3,7 +3,7 @@ import { adminDb } from '../../../../lib/firebaseAdmin';
 
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     const docRef = adminDb.collection('thoughts').doc(id);
     const docSnap = await docRef.get();
@@ -35,7 +35,7 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { title, blocks } = body;
 

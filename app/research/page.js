@@ -1,6 +1,6 @@
-import ThoughtsClient from './ThoughtsClient';
+import ResearchClient from './ResearchClient';
 
-export default function ThoughtsPage() {
+export default function ResearchPage() {
   return (
     <main
       style={{
@@ -17,24 +17,23 @@ export default function ThoughtsPage() {
               margin: 0,
             }}
           >
-            Thoughts
+            Research
           </h1>
           <p
             style={{
               margin: '0.5rem auto 0 auto',
-              maxWidth: '60ch',
+              maxWidth: '70ch',
               fontSize: 'clamp(1rem, 2.2vw, 1.1rem)',
               lineHeight: 1.6,
               opacity: 0.85,
             }}
           >
-            We all have thoughts. and these are mine. Things that I find interesting and worthy to talk about.
+            Notes, experiments, write-ups, and useful things I want to share and showcase.
           </p>
         </header>
 
-        <ThoughtsClient />
+        <ResearchClient />
       </div>
     </main>
   );
-
 }

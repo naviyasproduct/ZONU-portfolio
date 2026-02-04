@@ -58,6 +58,7 @@ export default function Nav() {
             {/* Desktop Links */}
             <div className="hidden sm:flex gap-3 text-xs">
               <Link href="/thoughts" className="hover:opacity-70 transition-opacity">Thoughts</Link>
+              <Link href="/research" className="hover:opacity-70 transition-opacity">Research</Link>
               <Link href="/contact" className="hover:opacity-70 transition-opacity">Contact</Link>
             </div>
             
@@ -159,6 +160,22 @@ export default function Nav() {
               onMouseLeave={(e) => e.currentTarget.style.opacity = pathname === '/thoughts' ? '1' : '0.8'}
             >
               Thoughts
+            </Link>
+            <Link 
+              href="/research" 
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                padding: '0.5rem 0.75rem',
+                fontSize: '0.875rem',
+                textAlign: 'left',
+                color: 'white',
+                transition: 'opacity 0.2s ease',
+                opacity: pathname === '/research' ? '1' : '0.8',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = pathname === '/research' ? '1' : '0.8'}
+            >
+              Research
             </Link>
             <Link 
               href="/contact" 

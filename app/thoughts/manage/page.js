@@ -5,6 +5,7 @@ import { db } from '../../../lib/firebaseConfig';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import AdminTopNav from '../../components/AdminTopNav';
 
 export default function ManageThoughtsPage() {
   const router = useRouter();
@@ -121,6 +122,7 @@ export default function ManageThoughtsPage() {
       minHeight: '100vh',
       padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 1.5rem)',
     }}>
+      <AdminTopNav />
       <div style={{
         maxWidth: '1400px',
         margin: '0 auto',

@@ -3,7 +3,7 @@ import { adminDb } from '../../../../../lib/firebaseAdmin';
 
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     const commentsSnap = await adminDb.collection('comments')
       .where('thoughtId', '==', id)

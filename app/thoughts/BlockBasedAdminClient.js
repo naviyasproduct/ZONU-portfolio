@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '../../lib/firebaseConfig';
 import Link from 'next/link';
+import Image from 'next/image';
+import AdminTopNav from '../components/AdminTopNav';
 
 export default function BlockBasedAdminClient() {
   // Content blocks system
@@ -234,6 +236,7 @@ export default function BlockBasedAdminClient() {
       margin: '0 auto', 
       padding: '1rem',
     }}>
+      <AdminTopNav />
       {/* Logout Button */}
       <div style={{
         display: 'flex',
@@ -846,9 +849,12 @@ function BlockEditor({ block, index, totalBlocks, onUpdate, onDelete, onMove }) 
                   cursor: 'ew-resize',
                 }}>
                   {block.type === 'image' ? (
-                    <img
+                    <Image
                       src={previewUrl}
                       alt="Preview"
+                      width={1200}
+                      height={800}
+                      unoptimized
                       onMouseDown={handleMouseDown}
                       style={{
                         width: '100%',
