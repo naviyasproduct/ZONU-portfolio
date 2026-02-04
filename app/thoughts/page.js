@@ -25,12 +25,17 @@ export default function ThoughtsPage() {
               maxWidth: '60ch',
               fontSize: 'clamp(1rem, 2.2vw, 1.1rem)',
               lineHeight: 1.6,
+
+              //ffasdad
               opacity: 0.85,
             }}
           >
             We all have thoughts. and these are mine. Things that I find interesting and worthy to talk about.
           </p>
         </header>
+
+
+        
 
         <ThoughtsClient />
       </div>
