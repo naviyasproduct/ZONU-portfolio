@@ -1,20 +1,24 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
+import { Mulish } from "next/font/google";
 import "./globals.css";
 import Nav from './components/Nav';
 import ClientThemeWrapper from './components/ClientThemeWrapper';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const mainFont = localFont({
+  src: "../public/fonts/Orbitron-VariableFont_wght.ttf",
+  variable: "--font-main",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const mulish = Mulish({
+  variable: "--font-mulish",
   subsets: ["latin"],
+  weight: ["200", "300", "400", "500", "600", "700", "800", "900", "1000"],
+  display: "swap",
 });
 
 export const metadata = {
-  title: "Naviya Portfolio",
+  title: "ZONU",
   description: "Personal portfolio with thoughts and projects",
 };
 
@@ -22,7 +26,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${mainFont.variable} ${mulish.variable} antialiased`}
         style={{ margin: 0, padding: 0 }}
       >
         <ClientThemeWrapper>

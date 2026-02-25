@@ -1,6 +1,7 @@
 "use client";
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import ThemeToggle from './ThemeToggle';
 import CursorAnimationToggle from './CursorAnimationToggle';
@@ -38,8 +39,8 @@ export default function Nav() {
           <Link 
             href="/" 
             style={{
-              fontSize: 'clamp(0.95rem, 2.5vw, 1rem)',
-              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center',
               textDecoration: 'none',
               transition: 'opacity 0.3s ease',
               flexShrink: 0,
@@ -47,7 +48,13 @@ export default function Nav() {
             onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
             onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
           >
-            Naviya
+            <Image
+              src="/logo/Z_logo_new.png"
+              alt="ZONU logo"
+              width={36}
+              height={36}
+              priority
+            />
           </Link>
           <div style={{ 
             display: 'flex', 

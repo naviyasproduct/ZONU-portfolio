@@ -54,7 +54,7 @@ export default function Home() {
             lineHeight: 1.1,
             letterSpacing: '0.05em'
           }}>
-            Naviya
+            ZONU
           </h1>
           <p style={{ 
             fontSize: 'clamp(1rem, 3vw, 1.5rem)', 

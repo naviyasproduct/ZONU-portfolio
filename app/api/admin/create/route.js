@@ -20,8 +20,7 @@ export async function POST(req) {
       title,
       contentLength: content?.length,
       hasMediaUrl: !!mediaUrl,
-      additionalMediaCount: additionalMedia?.length || 0,
-      additionalMedia,
+      additionalMediaCount: Array.isArray(additionalMedia) ? additionalMedia.length : 0,
     });
     
     const docRef = await adminDb.collection('thoughts').add({
@@ -37,7 +36,7 @@ export async function POST(req) {
     console.log('✅ Successfully saved with ID:', docRef.id);
     return NextResponse.json({ id: docRef.id });
   } catch (err) {
-    console.error('❌ Admin create error:', err);
+    console.error('❌ Admin create error:', err?.message || err);
     return NextResponse.json({ error: err.message || String(err) }, { status: 500 });
   }
 }
