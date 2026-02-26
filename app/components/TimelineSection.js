@@ -4,17 +4,94 @@ import { useEffect, useRef, useState } from 'react';
 
 // ─── Event data ────────────────────────────────────────────────────────────────
 const EVENTS = [
-  { year: '2003', title: 'First Day of School',  desc: 'The adventure of learning starts' },
-  { year: '2007', title: 'First Computer',       desc: 'Fell in love with technology' },
-  { year: '2010', title: 'Moved Cities',         desc: 'A new chapter, a new home' },
-  { year: '2013', title: 'Got First Camera',     desc: 'Discovered visual storytelling' },
-  { year: '2015', title: 'High School Grad',     desc: 'Finished with honours' },
-  { year: '2016', title: 'University Begins',    desc: 'Design & computer science' },
-  { year: '2018', title: 'First Exhibition',     desc: 'Showed work publicly for the first time' },
-  { year: '2020', title: 'Pandemic Year',        desc: 'Built, broke and rebuilt everything' },
-  { year: '2022', title: 'First Studio Role',    desc: 'Turned passion into a profession' },
-  { year: '2024', title: 'Going Independent',   desc: 'Launched solo creative practice' },
-  { year: '2026', title: 'This Portfolio',       desc: 'A window into the journey so far' },
+  {
+    year: '2003',
+    title: 'First Day of School',
+    desc: 'The adventure of learning starts',
+    details: 'A curious beginning shaped by notebooks, sketches and stories.',
+    highlights: ['Learned discipline through daily routines', 'Built confidence through speaking and reading', 'Started documenting moments and memories'],
+    image: '/hero/frame_0008.jpg',
+  },
+  {
+    year: '2007',
+    title: 'First Computer',
+    desc: 'Fell in love with technology',
+    details: 'The first machine that turned curiosity into hands-on exploration.',
+    highlights: ['Learned basic software and internet tools', 'Started experimenting with digital creativity', 'Began seeing design and tech as one path'],
+    image: '/hero/frame_0020.jpg',
+  },
+  {
+    year: '2010',
+    title: 'Moved Cities',
+    desc: 'A new chapter, a new home',
+    details: 'Adapting to a new place developed perspective, resilience, and independence.',
+    highlights: ['Adjusted to new schools and communities', 'Built stronger self-direction', 'Turned change into growth'],
+    image: '/hero/frame_0032.jpg',
+  },
+  {
+    year: '2013',
+    title: 'Got First Camera',
+    desc: 'Discovered visual storytelling',
+    details: 'Photography became a lens for emotion, narrative, and visual composition.',
+    highlights: ['Learned framing, light, and timing', 'Captured people, places, and small details', 'Developed a personal visual language'],
+    image: '/hero/frame_0044.jpg',
+  },
+  {
+    year: '2015',
+    title: 'High School Grad',
+    desc: 'Finished with honours',
+    details: 'A milestone that confirmed the value of consistency and focused effort.',
+    highlights: ['Graduated with strong academic standing', 'Balanced studies with creative work', 'Prepared for the next education step'],
+    image: '/hero/frame_0056.jpg',
+  },
+  {
+    year: '2016',
+    title: 'University Begins',
+    desc: 'Design & computer science',
+    details: 'Formal study united design thinking with technical problem solving.',
+    highlights: ['Explored UI/UX and software fundamentals', 'Built collaborative project experience', 'Strengthened research and critique skills'],
+    image: '/hero/frame_0068.jpg',
+  },
+  {
+    year: '2018',
+    title: 'First Exhibition',
+    desc: 'Showed work publicly for the first time',
+    details: 'Presenting work to a live audience transformed process into conversation.',
+    highlights: ['Curated and displayed selected works', 'Received real-world audience feedback', 'Learned to present creative intent clearly'],
+    image: '/hero/frame_0080.jpg',
+  },
+  {
+    year: '2020',
+    title: 'Pandemic Year',
+    desc: 'Built, broke and rebuilt everything',
+    details: 'A difficult period that accelerated remote workflows and self-reinvention.',
+    highlights: ['Shifted to fully digital collaboration', 'Iterated rapidly through uncertainty', 'Turned setbacks into stronger systems'],
+    image: '/hero/frame_0092.jpg',
+  },
+  {
+    year: '2022',
+    title: 'First Studio Role',
+    desc: 'Turned passion into a profession',
+    details: 'Professional studio work sharpened standards, velocity, and team craft.',
+    highlights: ['Delivered work in production environments', 'Collaborated across disciplines', 'Improved quality under real deadlines'],
+    image: '/hero/frame_0104.jpg',
+  },
+  {
+    year: '2024',
+    title: 'Going Independent',
+    desc: 'Launched solo creative practice',
+    details: 'Independent practice opened room for voice, direction, and ownership.',
+    highlights: ['Defined personal brand and service scope', 'Worked directly with clients', 'Built sustainable solo workflows'],
+    image: '/hero/frame_0116.jpg',
+  },
+  {
+    year: '2026',
+    title: 'This Portfolio',
+    desc: 'A window into the journey so far',
+    details: 'This timeline captures milestones that shaped a creative-technical path.',
+    highlights: ['Connected story, design, and interaction', 'Created a clear narrative experience', 'Prepared the base for future chapters'],
+    image: '/hero/frame_0128.jpg',
+  },
 ];
 
 // ─── Layout constants ─────────────────────────────────────────────────────────
@@ -25,6 +102,7 @@ const START_R      = 30;    // start ball radius (bigger)
 const PAD_RIGHT_MIN = 200;  // minimum px after present marker
 const LERP_TX      = 0.07;  // translateX smoothing
 const LERP_FADE    = 0.06;  // opacity smoothing
+const MODAL_ANIM_MS = 520;
 
 // 0 = start(birth), 1..N = events, N+1 = present
 const NUM_STOPS = EVENTS.length + 2;
@@ -42,6 +120,13 @@ function applyGlow(el, level) {
     `0 0 6px rgba(255,255,255,${l * 0.95})`;
 }
 
+function formatCurrentDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year} ${month} ${day}`;
+}
+
 export default function TimelineSection() {
   const sectionRef    = useRef(null);
   const rafRef        = useRef(null);
@@ -50,6 +135,8 @@ export default function TimelineSection() {
   const fillLineRef   = useRef(null);
   const startBallRef  = useRef(null);
   const ballRefs      = useRef(EVENTS.map(() => null));
+  const modalCloseTimeoutRef = useRef(null);
+  const modalOpenRafRef = useRef(null);
 
   // Raw lerp state (no setState — drives RAF only)
   const targetTX      = useRef(0);
@@ -62,6 +149,90 @@ export default function TimelineSection() {
   const [viewportW, setViewportW] = useState(
     typeof window !== 'undefined' ? window.innerWidth : 1440
   );
+  const [currentDateLabel, setCurrentDateLabel] = useState(
+    formatCurrentDate(new Date())
+  );
+  const [activeEventIndex, setActiveEventIndex] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const activeEvent = activeEventIndex !== null ? EVENTS[activeEventIndex] : null;
+
+  const openEventModal = (index) => {
+    if (modalCloseTimeoutRef.current) {
+      clearTimeout(modalCloseTimeoutRef.current);
+      modalCloseTimeoutRef.current = null;
+    }
+    if (modalOpenRafRef.current) {
+      cancelAnimationFrame(modalOpenRafRef.current);
+      modalOpenRafRef.current = null;
+    }
+
+    setActiveEventIndex(index);
+    setIsModalOpen(false);
+    modalOpenRafRef.current = requestAnimationFrame(() => {
+      setIsModalOpen(true);
+    });
+  };
+
+  const closeEventModal = () => {
+    setIsModalOpen(false);
+    if (modalCloseTimeoutRef.current) clearTimeout(modalCloseTimeoutRef.current);
+    modalCloseTimeoutRef.current = setTimeout(() => {
+      setActiveEventIndex(null);
+      modalCloseTimeoutRef.current = null;
+    }, MODAL_ANIM_MS);
+  };
+
+  useEffect(() => {
+    const now = new Date();
+    const nextMidnight = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + 1,
+      0,
+      0,
+      0,
+      0
+    );
+    const msUntilMidnight = nextMidnight.getTime() - now.getTime();
+    let intervalId;
+
+    const timeoutId = setTimeout(() => {
+      setCurrentDateLabel(formatCurrentDate(new Date()));
+      intervalId = setInterval(() => {
+        setCurrentDateLabel(formatCurrentDate(new Date()));
+      }, 24 * 60 * 60 * 1000);
+    }, msUntilMidnight);
+
+    return () => {
+      clearTimeout(timeoutId);
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (activeEventIndex === null) return;
+
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') closeEventModal();
+    };
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [activeEventIndex]);
+
+  useEffect(() => {
+    return () => {
+      if (modalCloseTimeoutRef.current) clearTimeout(modalCloseTimeoutRef.current);
+      if (modalOpenRafRef.current) cancelAnimationFrame(modalOpenRafRef.current);
+    };
+  }, []);
 
   // maxTranslate & viewport width on resize
   useEffect(() => {
@@ -164,7 +335,8 @@ export default function TimelineSection() {
         position:   'relative',
         height:     '700vh',
         width:      '100%',
-        background: '#080808',
+        background: activeEvent ? '#050b1e' : '#080808',
+        transition: `background ${MODAL_ANIM_MS + 180}ms ease`,
       }}
     >
       {/* ── Sticky viewport ─────────────────────────────────────────────── */}
@@ -182,6 +354,21 @@ export default function TimelineSection() {
           willChange: 'opacity',
         }}
       >
+        {activeEvent && (
+          <div
+            onClick={closeEventModal}
+            style={{
+              position:      'absolute',
+              inset:         0,
+              zIndex:        25,
+              background:    'radial-gradient(circle at 50% 45%, rgba(66, 133, 244, 0.28), rgba(7, 20, 54, 0.62) 55%, rgba(2, 7, 18, 0.84) 100%)',
+              backdropFilter:'blur(6px)',
+              opacity:       isModalOpen ? 1 : 0,
+              transition:    `opacity ${MODAL_ANIM_MS}ms ease`,
+            }}
+          />
+        )}
+
         {/* Right-edge fade mask: nodes fade in as they enter from the right */}
         <div style={{
           position:   'absolute',
@@ -296,7 +483,10 @@ export default function TimelineSection() {
                 }}
               >
                 {/* Ball */}
-                <div
+                <button
+                  type="button"
+                  onClick={() => openEventModal(i)}
+                  aria-label={`Open details for ${event.title} (${event.year})`}
                   ref={el => ballRefs.current[i] = el}
                   style={{
                     width:        `${NODE_R * 2}px`,
@@ -307,6 +497,10 @@ export default function TimelineSection() {
                     position:     'relative',
                     zIndex:       2,
                     flexShrink:   0,
+                    border:       'none',
+                    outline:      'none',
+                    cursor:       'pointer',
+                    padding:      0,
                   }}
                 />
 
@@ -369,33 +563,141 @@ export default function TimelineSection() {
 
           {/* ── Present marker ──────────────────────────────────────────── */}
           <div style={{
-            position:      'absolute',
-            left:          `${presentX}px`,
-            top:           '50%',
-            transform:     'translate(-50%, -50%)',
-            display:       'flex',
-            flexDirection: 'column',
-            alignItems:    'center',
-            gap:           '10px',
-            color:         'white',
+            position:  'absolute',
+            left:      `${presentX}px`,
+            top:       '50%',
+            transform: 'translateX(-50%)',
+            color:     'white',
+            zIndex:    3,
           }}>
             <div style={{
+              position:      'absolute',
+              bottom:        '120px',
+              left:          '50%',
+              transform:     'translateX(-50%)',
               fontSize:      '0.56rem',
               opacity:       0.4,
               letterSpacing: '0.2em',
               textTransform: 'uppercase',
               fontFamily:    'var(--font-main), sans-serif',
+              whiteSpace:    'nowrap',
             }}>
-              Present
+              {currentDateLabel}
             </div>
             <div style={{
               width:        '1.5px',
               height:       '110px',
               background:   'linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.05))',
               borderRadius: '1px',
+              transform:    'translateY(-100%)',
             }} />
           </div>
         </div>
+
+        {activeEvent && (
+          <div
+            onClick={closeEventModal}
+            style={{
+              position:      'absolute',
+              inset:         0,
+              zIndex:        35,
+              display:       'flex',
+              alignItems:    'center',
+              justifyContent:'center',
+              padding:       '1.2rem',
+              opacity:       isModalOpen ? 1 : 0,
+              transition:    `opacity ${MODAL_ANIM_MS}ms ease`,
+            }}
+          >
+            <div
+              onClick={(event) => event.stopPropagation()}
+              style={{
+                width:         'min(760px, 94vw)',
+                maxHeight:     '84vh',
+                overflowY:     'auto',
+                borderRadius:  '20px',
+                border:        '1px solid rgba(255,255,255,0.22)',
+                background:    'linear-gradient(160deg, rgba(255,255,255,0.22), rgba(255,255,255,0.08))',
+                boxShadow:     '0 20px 60px rgba(0, 20, 80, 0.45)',
+                backdropFilter:'blur(14px)',
+                WebkitBackdropFilter: 'blur(14px)',
+                color:         'white',
+                transform:     isModalOpen ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.96)',
+                opacity:       isModalOpen ? 1 : 0,
+                transition:    `transform ${MODAL_ANIM_MS}ms cubic-bezier(0.22, 1, 0.36, 1), opacity ${MODAL_ANIM_MS}ms ease`,
+              }}
+            >
+              <div style={{ position: 'relative', width: '100%', height: '220px', overflow: 'hidden' }}>
+                <img
+                  src={activeEvent.image}
+                  alt={`${activeEvent.title} visual`}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', opacity: 0.8 }}
+                />
+                <div style={{
+                  position:   'absolute',
+                  inset:      0,
+                  background: 'linear-gradient(to top, rgba(5,11,30,0.85), rgba(5,11,30,0.2) 55%, rgba(5,11,30,0))',
+                }} />
+                <button
+                  type="button"
+                  onClick={closeEventModal}
+                  aria-label="Close event details"
+                  style={{
+                    position:      'absolute',
+                    top:           '12px',
+                    right:         '12px',
+                    width:         '34px',
+                    height:        '34px',
+                    borderRadius:  '999px',
+                    border:        '1px solid rgba(255,255,255,0.35)',
+                    background:    'rgba(255,255,255,0.15)',
+                    color:         'white',
+                    cursor:        'pointer',
+                    fontSize:      '1.05rem',
+                    lineHeight:    1,
+                    backdropFilter:'blur(8px)',
+                  }}
+                >
+                  ×
+                </button>
+                <div style={{ position: 'absolute', left: '1.1rem', bottom: '1rem' }}>
+                  <div style={{ fontSize: '0.68rem', opacity: 0.75, letterSpacing: '0.18em', fontFamily: 'var(--font-main), sans-serif' }}>
+                    {activeEvent.year}
+                  </div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '0.35rem', fontFamily: 'var(--font-main), sans-serif' }}>
+                    {activeEvent.title}
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ padding: '1.2rem 1.2rem 1.3rem' }}>
+                <p style={{ margin: 0, opacity: 0.9, lineHeight: 1.7, fontSize: '0.95rem', fontFamily: 'var(--font-mulish), sans-serif' }}>
+                  {activeEvent.details}
+                </p>
+
+                <div style={{ marginTop: '1rem' }}>
+                  {activeEvent.highlights.map((item) => (
+                    <div
+                      key={item}
+                      style={{
+                        display:       'flex',
+                        alignItems:    'flex-start',
+                        gap:           '0.6rem',
+                        marginBottom:  '0.62rem',
+                        fontSize:      '0.9rem',
+                        opacity:       0.9,
+                        fontFamily:    'var(--font-mulish), sans-serif',
+                      }}
+                    >
+                      <span style={{ opacity: 0.8 }}>•</span>
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ── Scroll hint ───────────────────────────────────────────────── */}
         <div style={{
