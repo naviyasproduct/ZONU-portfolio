@@ -603,11 +603,29 @@ export default function TimelineSection() {
                 transition:    `transform ${MODAL_ANIM_MS}ms cubic-bezier(0.22, 1, 0.36, 1), opacity ${MODAL_ANIM_MS}ms ease`,
               }}
             >
-              <div style={{ position: 'relative', width: '100%', height: '220px', overflow: 'hidden' }}>
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  maxHeight: '58vh',
+                  overflow: 'hidden',
+                  background: 'rgba(5, 11, 30, 0.65)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
                 <img
                   src={activeEvent.image}
                   alt={`${activeEvent.title} visual`}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', opacity: 0.8 }}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    maxHeight: '58vh',
+                    objectFit: 'contain',
+                    display: 'block',
+                    opacity: 0.92,
+                  }}
                 />
                 <div style={{
                   position:   'absolute',
