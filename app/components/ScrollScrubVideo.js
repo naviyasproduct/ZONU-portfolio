@@ -28,6 +28,8 @@ export default function ScrollScrubVideo({ sectionRef }) {
     let currentProgress = 0;
     let lastDrawnFrame = -1;
     let dpr = 1;
+    let targetOpacity = 1;
+    let currentOpacity = 1;
 
     // ── Canvas sizing: full viewport ─────────────────────────────────────────
     const resize = () => {
@@ -74,6 +76,18 @@ export default function ScrollScrubVideo({ sectionRef }) {
         lastDrawnFrame = idx;
         paint(images[idx]);
       }
+
+      const opacityDiff = targetOpacity - currentOpacity;
+      if (Math.abs(opacityDiff) > 0.002) {
+        currentOpacity += opacityDiff * 0.12;
+      } else {
+        currentOpacity = targetOpacity;
+      }
+      if (targetOpacity === 0 && currentOpacity < 0.02) {
+        currentOpacity = 0;
+      }
+      canvas.style.opacity = String(currentOpacity);
+      canvas.style.visibility = currentOpacity === 0 ? "hidden" : "visible";
     };
     rafId = requestAnimationFrame(render);
 
@@ -85,7 +99,21 @@ export default function ScrollScrubVideo({ sectionRef }) {
       return scrolled / scrollable;
     };
 
-    const onScroll = () => { targetProgress = getProgress(); };
+    const onScroll = () => {
+      const progress = getProgress();
+      targetProgress = progress;
+
+      // Fade out before the sticky section unpins, so last frame never drifts up.
+      const fadeStart = 0.90;
+      const fadeEnd = 0.94;
+      if (progress <= fadeStart) {
+        targetOpacity = 1;
+      } else if (progress >= fadeEnd) {
+        targetOpacity = 0;
+      } else {
+        targetOpacity = 1 - (progress - fadeStart) / (fadeEnd - fadeStart);
+      }
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
 
     // ── Resize (debounced to one rAF) ────────────────────────────────────────
@@ -120,6 +148,7 @@ export default function ScrollScrubVideo({ sectionRef }) {
     // Set initial state
     targetProgress = getProgress();
     currentProgress = targetProgress;
+    onScroll();
 
     return () => {
       destroyed = true;
