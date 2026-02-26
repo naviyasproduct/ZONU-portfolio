@@ -3,96 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 // ─── Event data ────────────────────────────────────────────────────────────────
-const EVENTS = [
-  {
-    year: '2003',
-    title: 'First Day of School',
-    desc: 'The adventure of learning starts',
-    details: 'A curious beginning shaped by notebooks, sketches and stories.',
-    highlights: ['Learned discipline through daily routines', 'Built confidence through speaking and reading', 'Started documenting moments and memories'],
-    image: '/hero/frame_0008.jpg',
-  },
-  {
-    year: '2007',
-    title: 'First Computer',
-    desc: 'Fell in love with technology',
-    details: 'The first machine that turned curiosity into hands-on exploration.',
-    highlights: ['Learned basic software and internet tools', 'Started experimenting with digital creativity', 'Began seeing design and tech as one path'],
-    image: '/hero/frame_0020.jpg',
-  },
-  {
-    year: '2010',
-    title: 'Moved Cities',
-    desc: 'A new chapter, a new home',
-    details: 'Adapting to a new place developed perspective, resilience, and independence.',
-    highlights: ['Adjusted to new schools and communities', 'Built stronger self-direction', 'Turned change into growth'],
-    image: '/hero/frame_0032.jpg',
-  },
-  {
-    year: '2013',
-    title: 'Got First Camera',
-    desc: 'Discovered visual storytelling',
-    details: 'Photography became a lens for emotion, narrative, and visual composition.',
-    highlights: ['Learned framing, light, and timing', 'Captured people, places, and small details', 'Developed a personal visual language'],
-    image: '/hero/frame_0044.jpg',
-  },
-  {
-    year: '2015',
-    title: 'High School Grad',
-    desc: 'Finished with honours',
-    details: 'A milestone that confirmed the value of consistency and focused effort.',
-    highlights: ['Graduated with strong academic standing', 'Balanced studies with creative work', 'Prepared for the next education step'],
-    image: '/hero/frame_0056.jpg',
-  },
-  {
-    year: '2016',
-    title: 'University Begins',
-    desc: 'Design & computer science',
-    details: 'Formal study united design thinking with technical problem solving.',
-    highlights: ['Explored UI/UX and software fundamentals', 'Built collaborative project experience', 'Strengthened research and critique skills'],
-    image: '/hero/frame_0068.jpg',
-  },
-  {
-    year: '2018',
-    title: 'First Exhibition',
-    desc: 'Showed work publicly for the first time',
-    details: 'Presenting work to a live audience transformed process into conversation.',
-    highlights: ['Curated and displayed selected works', 'Received real-world audience feedback', 'Learned to present creative intent clearly'],
-    image: '/hero/frame_0080.jpg',
-  },
-  {
-    year: '2020',
-    title: 'Pandemic Year',
-    desc: 'Built, broke and rebuilt everything',
-    details: 'A difficult period that accelerated remote workflows and self-reinvention.',
-    highlights: ['Shifted to fully digital collaboration', 'Iterated rapidly through uncertainty', 'Turned setbacks into stronger systems'],
-    image: '/hero/frame_0092.jpg',
-  },
-  {
-    year: '2022',
-    title: 'First Studio Role',
-    desc: 'Turned passion into a profession',
-    details: 'Professional studio work sharpened standards, velocity, and team craft.',
-    highlights: ['Delivered work in production environments', 'Collaborated across disciplines', 'Improved quality under real deadlines'],
-    image: '/hero/frame_0104.jpg',
-  },
-  {
-    year: '2024',
-    title: 'Going Independent',
-    desc: 'Launched solo creative practice',
-    details: 'Independent practice opened room for voice, direction, and ownership.',
-    highlights: ['Defined personal brand and service scope', 'Worked directly with clients', 'Built sustainable solo workflows'],
-    image: '/hero/frame_0116.jpg',
-  },
-  {
-    year: '2026',
-    title: 'This Portfolio',
-    desc: 'A window into the journey so far',
-    details: 'This timeline captures milestones that shaped a creative-technical path.',
-    highlights: ['Connected story, design, and interaction', 'Created a clear narrative experience', 'Prepared the base for future chapters'],
-    image: '/hero/frame_0128.jpg',
-  },
-];
+const DEFAULT_EVENTS = [];
 
 // ─── Layout constants ─────────────────────────────────────────────────────────
 // START_X is computed dynamically as viewportW/2 so start ball is always centred
@@ -103,9 +14,6 @@ const PAD_RIGHT_MIN = 200;  // minimum px after present marker
 const LERP_TX      = 0.07;  // translateX smoothing
 const LERP_FADE    = 0.06;  // opacity smoothing
 const MODAL_ANIM_MS = 520;
-
-// 0 = start(birth), 1..N = events, N+1 = present
-const NUM_STOPS = EVENTS.length + 2;
 
 // ─── Glow helpers ─────────────────────────────────────────────────────────────
 function applyGlow(el, level) {
@@ -127,6 +35,12 @@ function formatCurrentDate(date) {
   return `${year} ${month} ${day}`;
 }
 
+function formatEventDateLabel(value) {
+  if (!value) return '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value.replace(/-/g, ' ');
+  return value;
+}
+
 export default function TimelineSection() {
   const sectionRef    = useRef(null);
   const rafRef        = useRef(null);
@@ -134,7 +48,7 @@ export default function TimelineSection() {
   const innerRef      = useRef(null);
   const fillLineRef   = useRef(null);
   const startBallRef  = useRef(null);
-  const ballRefs      = useRef(EVENTS.map(() => null));
+  const ballRefs      = useRef([]);
   const modalCloseTimeoutRef = useRef(null);
   const modalOpenRafRef = useRef(null);
 
@@ -152,10 +66,57 @@ export default function TimelineSection() {
   const [currentDateLabel, setCurrentDateLabel] = useState(
     formatCurrentDate(new Date())
   );
+  const [events, setEvents] = useState(DEFAULT_EVENTS);
   const [activeEventIndex, setActiveEventIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const activeEvent = activeEventIndex !== null ? EVENTS[activeEventIndex] : null;
+  const activeEvent = activeEventIndex !== null ? events[activeEventIndex] : null;
+
+  // 0 = start(birth), 1..N = events, N+1 = present
+  const NUM_STOPS = events.length + 2;
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadEvents() {
+      try {
+        const res = await fetch('/api/timeline?limit=250', { cache: 'no-store' });
+        const json = await res.json();
+        if (!mounted) return;
+
+        if (!res.ok || !json?.success) return;
+        const items = Array.isArray(json.items) ? json.items : [];
+        if (items.length === 0) return;
+
+        const normalized = items
+          .map((item) => ({
+            eventDate: formatEventDateLabel(String(item.eventDate || item.year || '')),
+            title: typeof item.title === 'string' ? item.title : '',
+            shortDescription: typeof item.shortDescription === 'string' ? item.shortDescription : (typeof item.desc === 'string' ? item.desc : ''),
+            description: typeof item.description === 'string' ? item.description : (typeof item.details === 'string' ? item.details : ''),
+            image: typeof item.image === 'string' ? item.image : '',
+          }))
+          .filter((item) => item.eventDate && item.title && item.shortDescription && item.description && item.image);
+
+        if (normalized.length > 0) setEvents(normalized);
+      } catch (err) {
+        console.error('Timeline load failed, using default events:', err);
+      }
+    }
+
+    loadEvents();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    ballRefs.current = ballRefs.current.slice(0, events.length);
+    if (activeEventIndex !== null && activeEventIndex >= events.length) {
+      setActiveEventIndex(null);
+      setIsModalOpen(false);
+    }
+  }, [events, activeEventIndex]);
 
   const openEventModal = (index) => {
     if (modalCloseTimeoutRef.current) {
@@ -326,7 +287,7 @@ export default function TimelineSection() {
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [NUM_STOPS]);
 
   return (
     <section
@@ -464,10 +425,25 @@ export default function TimelineSection() {
             }}>
               Birth
             </div>
+            <div style={{
+              position:      'absolute',
+              top:           `${START_R * 2 + 30}px`,
+              left:          '50%',
+              transform:     'translateX(-50%)',
+              fontSize:      '0.56rem',
+              fontWeight:    500,
+              letterSpacing: '0.08em',
+              opacity:       0.7,
+              color:         'white',
+              whiteSpace:    'nowrap',
+              fontFamily:    'var(--font-main), sans-serif',
+            }}>
+              2004 12 12
+            </div>
           </div>
 
           {/* ── Event nodes ─────────────────────────────────────────────── */}
-          {EVENTS.map((event, i) => {
+          {events.map((event, i) => {
             const cx    = startX + (i + 1) * NODE_SPACING;
             const above = i % 2 === 0;
 
@@ -535,7 +511,7 @@ export default function TimelineSection() {
                     marginBottom:  '3px',
                     fontFamily:    'var(--font-main), sans-serif',
                   }}>
-                    {event.year}
+                    {event.eventDate}
                   </div>
                   <div style={{
                     fontSize:      '0.76rem',
@@ -554,7 +530,7 @@ export default function TimelineSection() {
                     lineHeight: 1.4,
                     fontFamily: 'var(--font-mulish), sans-serif',
                   }}>
-                    {event.desc}
+                    {event.shortDescription}
                   </div>
                 </div>
               </div>
@@ -662,7 +638,7 @@ export default function TimelineSection() {
                 </button>
                 <div style={{ position: 'absolute', left: '1.1rem', bottom: '1rem' }}>
                   <div style={{ fontSize: '0.68rem', opacity: 0.75, letterSpacing: '0.18em', fontFamily: 'var(--font-main), sans-serif' }}>
-                    {activeEvent.year}
+                    {activeEvent.eventDate}
                   </div>
                   <div style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '0.35rem', fontFamily: 'var(--font-main), sans-serif' }}>
                     {activeEvent.title}
@@ -672,28 +648,8 @@ export default function TimelineSection() {
 
               <div style={{ padding: '1.2rem 1.2rem 1.3rem' }}>
                 <p style={{ margin: 0, opacity: 0.9, lineHeight: 1.7, fontSize: '0.95rem', fontFamily: 'var(--font-mulish), sans-serif' }}>
-                  {activeEvent.details}
+                  {activeEvent.description}
                 </p>
-
-                <div style={{ marginTop: '1rem' }}>
-                  {activeEvent.highlights.map((item) => (
-                    <div
-                      key={item}
-                      style={{
-                        display:       'flex',
-                        alignItems:    'flex-start',
-                        gap:           '0.6rem',
-                        marginBottom:  '0.62rem',
-                        fontSize:      '0.9rem',
-                        opacity:       0.9,
-                        fontFamily:    'var(--font-mulish), sans-serif',
-                      }}
-                    >
-                      <span style={{ opacity: 0.8 }}>•</span>
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
           </div>

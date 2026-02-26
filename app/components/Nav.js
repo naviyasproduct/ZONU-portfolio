@@ -20,6 +20,7 @@ const CONTENT_TRANSITION =
 export default function Nav() {
   const pathname = usePathname();
   const isContactPage = pathname === '/contact';
+  const isHomePage = pathname === '/';
 
   const [expanded,       setExpanded]       = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -169,7 +170,7 @@ export default function Nav() {
           )}
 
           <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-            <ThemeToggle />
+            <ThemeToggle disabled={isHomePage} />
           </div>
         </div>
       </div>

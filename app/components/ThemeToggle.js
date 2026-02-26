@@ -1,7 +1,7 @@
 "use client";
 import { useTheme } from '../context/ThemeContext';
 
-export default function ThemeToggle() {
+export default function ThemeToggle({ disabled = false }) {
   const { theme, toggleTheme, mounted } = useTheme();
 
   // Don't render until mounted to avoid hydration mismatch
@@ -28,12 +28,14 @@ export default function ThemeToggle() {
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('Theme toggle clicked, current theme:', theme);
+        if (disabled) return;
         toggleTheme();
       }}
       aria-label="Toggle theme"
+      aria-disabled={disabled}
+      disabled={disabled}
       style={{ 
-        cursor: 'pointer',
+        cursor: disabled ? 'not-allowed' : 'pointer',
         position: 'relative',
         zIndex: 1000,
         width: '32px',
@@ -46,13 +48,16 @@ export default function ThemeToggle() {
         backdropFilter: 'blur(10px)',
         border: '1px solid rgba(255, 255, 255, 0.25)',
         transition: 'all 0.3s ease',
-        padding: 0
+        padding: 0,
+        opacity: disabled ? 0.5 : 1
       }}
       onMouseEnter={(e) => {
+        if (disabled) return;
         e.currentTarget.style.transform = 'scale(1.1)';
         e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)';
       }}
       onMouseLeave={(e) => {
+        if (disabled) return;
         e.currentTarget.style.transform = 'scale(1)';
         e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
       }}

@@ -16,6 +16,7 @@ export function middleware(request) {
     /^\/thoughts\/.+\/edit$/.test(pathname) ||
     pathname.startsWith('/research/admin') ||
     pathname.startsWith('/research/manage') ||
+    pathname.startsWith('/timeline/manage') ||
     /^\/research\/.+\/edit$/.test(pathname);
 
   if (isProtected) {
@@ -38,5 +39,6 @@ export const config = {
     '/research/admin/:path*',
     '/research/manage',
     '/research/:id/edit',
+    '/timeline/manage',
   ],
 };
