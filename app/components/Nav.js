@@ -12,7 +12,7 @@ export default function Nav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="w-full sticky top-0 z-[100]" style={{ 
+    <nav className="w-full fixed top-0 left-0 z-[100]" style={{ 
       padding: '0.5rem clamp(0.5rem, 2vw, 1rem)',
       marginLeft: 0, 
       marginRight: 0 
