@@ -15,6 +15,7 @@ export default function Home() {
         ref={heroSectionRef}
         style={{
           position: 'relative',
+          marginTop: 'calc(-1 * var(--nav-offset))',
           height: '400vh',
           width: '100%',
           background: '#080808',

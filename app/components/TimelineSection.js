@@ -60,12 +60,10 @@ export default function TimelineSection() {
 
   const targetStopFloat = useRef(0);
 
-  const [viewportW, setViewportW] = useState(
-    typeof window !== 'undefined' ? window.innerWidth : 1440
-  );
-  const [currentDateLabel, setCurrentDateLabel] = useState(
-    formatCurrentDate(new Date())
-  );
+  // NOTE: Keep initial render deterministic for SSR hydration.
+  // We intentionally avoid reading `window`/`Date` during initial state.
+  const [viewportW, setViewportW] = useState(1440);
+  const [currentDateLabel, setCurrentDateLabel] = useState('');
   const [events, setEvents] = useState(DEFAULT_EVENTS);
   const [activeEventIndex, setActiveEventIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -145,6 +143,9 @@ export default function TimelineSection() {
   };
 
   useEffect(() => {
+    // Set initial label on the client (avoids server/client timezone mismatch).
+    setCurrentDateLabel(formatCurrentDate(new Date()));
+
     const now = new Date();
     const nextMidnight = new Date(
       now.getFullYear(),

@@ -63,8 +63,6 @@ function BlockRenderer({ blocks }) {
                   style={{
                     width: '100%',
                     height: 'auto',
-                    borderRadius: '12px',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
                   }}
                 />
               </div>
@@ -98,8 +96,6 @@ function BlockRenderer({ blocks }) {
                   src={block.url}
                   style={{
                     width: '100%',
-                    borderRadius: '12px',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
                   }}
                 />
               </div>
@@ -170,9 +166,6 @@ function RichContent({ content, additionalMedia }) {
             >
               <div style={{
                 width: `${widthPercent}%`,
-                borderRadius: '12px',
-                overflow: 'hidden',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
               }}>
                 <Image
                   src={media.url}
@@ -211,9 +204,6 @@ function RichContent({ content, additionalMedia }) {
             >
               <div style={{
                 width: `${widthPercent}%`,
-                borderRadius: '12px',
-                overflow: 'hidden',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
               }}>
                 <video
                   controls
@@ -564,11 +554,6 @@ export default function ThoughtPage() {
         width: '100%',
         maxWidth: '800px',
         padding: 'clamp(1.5rem, 4vw, 3rem)',
-        background: 'rgba(255, 255, 255, 0.05)',
-        backdropFilter: 'blur(30px)',
-        border: '2px solid rgba(255, 255, 255, 0.1)',
-        borderRadius: 'clamp(16px, 3vw, 24px)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
       }}>
         {/* Date & Time */}
         <div style={{
@@ -608,37 +593,50 @@ export default function ThoughtPage() {
         {thought.mediaUrl && (!thought.blocks || thought.blocks.length === 0) && (
           <div style={{
             marginBottom: '2.5rem',
-            borderRadius: '20px',
-            overflow: 'hidden',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
           }}>
             {thought.mediaType && thought.mediaType.startsWith('video') ? (
-              <video 
-                controls 
-                src={thought.mediaUrl}
+              <div
                 style={{
                   width: '100%',
-                  maxHeight: '600px',
-                  objectFit: 'cover',
-                  display: 'block',
+                  height: 'clamp(240px, 56vw, 640px)',
+                  background: 'transparent',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
-              />
+              >
+                <video
+                  controls
+                  src={thought.mediaUrl}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    display: 'block',
+                  }}
+                />
+              </div>
             ) : (
-              <Image 
-                src={thought.mediaUrl} 
-                alt={thought.title || 'thought'} 
-                width={800}
-                height={600}
+              <div
                 style={{
                   width: '100%',
-                  height: 'auto',
-                  maxHeight: '600px',
-                  objectFit: 'cover',
-                  display: 'block',
+                  height: 'clamp(240px, 56vw, 640px)',
+                  position: 'relative',
+                  background: 'transparent',
                 }}
-                priority
-              />
+              >
+                <Image
+                  src={thought.mediaUrl}
+                  alt={thought.title || 'thought'}
+                  fill
+                  sizes="(max-width: 800px) 100vw, 800px"
+                  style={{
+                    objectFit: 'contain',
+                    display: 'block',
+                  }}
+                  priority
+                />
+              </div>
             )}
           </div>
         )}
@@ -740,11 +738,6 @@ export default function ThoughtPage() {
         maxWidth: '800px',
         marginTop: '2rem',
         padding: '2.5rem',
-        background: 'rgba(255, 255, 255, 0.05)',
-        backdropFilter: 'blur(30px)',
-        border: '2px solid rgba(255, 255, 255, 0.1)',
-        borderRadius: '24px',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
       }}>
         <h2 style={{
           fontSize: '1.75rem',

@@ -31,7 +31,7 @@ export default function RootLayout({ children }) {
       >
         <ClientThemeWrapper>
           <Nav />
-          <main>
+          <main className="app-main">
             {children}
           </main>
         </ClientThemeWrapper>

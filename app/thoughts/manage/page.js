@@ -389,7 +389,8 @@ export default function ManageThoughtsPage() {
                               src={thought.mediaUrl}
                               alt={thought.title}
                               fill
-                              style={{ objectFit: 'cover' }}
+                              sizes="(max-width: 768px) 100vw, 350px"
+                              style={{ objectFit: 'contain' }}
                             />
                           </div>
                         )}

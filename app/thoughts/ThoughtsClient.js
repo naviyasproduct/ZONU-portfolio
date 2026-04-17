@@ -204,24 +204,31 @@ export default function ThoughtsClient() {
                     style={{
                       width: '100%',
                       height: '220px',
-                      objectFit: 'cover',
+                      objectFit: 'contain',
                       display: 'block',
                       pointerEvents: 'none',
                     }}
                   />
                 ) : (
-                  <Image
-                    src={post.mediaUrl}
-                    alt={post.title || 'thought'}
-                    width={900}
-                    height={280}
+                  <div
                     style={{
                       width: '100%',
                       height: '220px',
-                      objectFit: 'cover',
-                      display: 'block',
+                      position: 'relative',
+                      background: 'rgba(0, 0, 0, 0.15)',
                     }}
-                  />
+                  >
+                    <Image
+                      src={post.mediaUrl}
+                      alt={post.title || 'thought'}
+                      fill
+                      sizes="(max-width: 900px) 100vw, 900px"
+                      style={{
+                        objectFit: 'contain',
+                        display: 'block',
+                      }}
+                    />
+                  </div>
                 )}
               </div>
             )}
