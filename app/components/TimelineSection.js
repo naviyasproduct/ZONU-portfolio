@@ -242,10 +242,13 @@ export default function TimelineSection() {
       if (innerRef.current)
         innerRef.current.style.opacity = currentFade.current;
 
-      // ── Progress line (discrete to focused stop) ───────────────────────
+      // ── Progress line (always snap to nearest event stop, never between) ─
       const smoothedIdx = (currentTX.current + viewportW / 2 - startX) / NODE_SPACING;
-      const focusedStop = Math.max(0, Math.min(NUM_STOPS - 1, Math.round(smoothedIdx)));
-      const fillPct     = focusedStop / (NUM_STOPS - 1);
+      const snappedFillStop = Math.max(
+        0,
+        Math.min(NUM_STOPS - 1, Math.round(targetStopFloat.current))
+      );
+      const fillPct = snappedFillStop / (NUM_STOPS - 1);
       if (fillLineRef.current)
         fillLineRef.current.style.transform = `translateY(-50%) scaleX(${fillPct})`;
 
