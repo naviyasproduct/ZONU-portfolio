@@ -7,7 +7,6 @@ function isActive(pathname, href) {
   if (!pathname) return false;
   if (href === '/thoughts/manage') return pathname.startsWith('/thoughts');
   if (href === '/research/manage') return pathname.startsWith('/research');
-  if (href === '/timeline/manage') return pathname.startsWith('/timeline');
   if (href === '/admin') return pathname.startsWith('/admin');
   return pathname === href;
 }
@@ -74,9 +73,6 @@ export default function AdminTopNav() {
         <Link href="/research/manage" style={tabStyle(isActive(pathname, '/research/manage'))}>
           Research
         </Link>
-        <Link href="/timeline/manage" style={tabStyle(isActive(pathname, '/timeline/manage'))}>
-          Timeline
-        </Link>
       </div>
 
       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -85,9 +81,6 @@ export default function AdminTopNav() {
         </Link>
         <Link href="/research/admin" style={actionStyle}>
           + Research
-        </Link>
-        <Link href="/timeline/manage" style={actionStyle}>
-          + Event
         </Link>
         <button type="button" onClick={handleLogout} style={actionStyle}>
           Logout
